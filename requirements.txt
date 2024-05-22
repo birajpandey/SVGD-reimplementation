@@ -7,19 +7,22 @@ pip
 python-dotenv
 tqdm
 typer
+pytest
 
 # Numerical packages
 numpy
+jupyterlab
 scikit-learn
 scipy
 seaborn
 jax[cuda12]
-pytorch
+torch
+torchvision
 equinox
 diffrax
 matplotlib
 pandas
-pytest
+
 
 # Install the current package
 -e .
