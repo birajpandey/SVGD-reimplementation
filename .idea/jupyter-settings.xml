@@ -3,6 +3,15 @@
   <component name="JupyterPersistentConnectionParameters">
     <option name="moduleParameters">
       <map>
+        <entry key="$PROJECT_DIR$/.idea/SVGD_reproducibility.iml">
+          <value>
+            <JupyterConnectionParameters>
+              <option name="argv" value="jupyterlab --no-browser" />
+              <option name="managed" value="true" />
+              <option name="sdkName" value="" />
+            </JupyterConnectionParameters>
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/../transport_flow_models/.idea/transport_flow_models.iml">
           <value>
             <JupyterConnectionParameters>
