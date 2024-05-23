@@ -1,29 +1,25 @@
-from pathlib import Path
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.stats import norm
 
-import typer
-from loguru import logger
-from tqdm import tqdm
+def plot_distributions(initial_particles, transported_particles, density_params):
+    plt.figure(figsize=(10, 6))
 
-from svgd.config import FIGURES_DIR, PROCESSED_DATA_DIR
+    # Plot histogram of initial particles
+    plt.hist(initial_particles, bins=30, density=True, alpha=0.4, color='b', label='Initial Particles')
 
-app = typer.Typer()
+    # Plot histogram of transported particles
+    plt.hist(transported_particles, bins=30, density=True, alpha=0.4, color='g', label='Transported Particles')
 
+    # Plot the target density function
+    mean = density_params['mean'][0]
+    std_dev = np.sqrt(density_params['covariance'][0, 0])
+    x = np.linspace(mean - 4 * std_dev, mean + 4 * std_dev, 1000)
+    y = norm.pdf(x, mean, std_dev)
+    plt.plot(x, y, 'r-', lw=2, label='Target Distribution')
 
-@app.command()
-def main(
-    # ---- REPLACE DEFAULT PATHS AS APPROPRIATE ----
-    input_path: Path = PROCESSED_DATA_DIR / "dataset.csv",
-    output_path: Path = FIGURES_DIR / "plot.png",
-    # -----------------------------------------
-):
-    # ---- REPLACE THIS WITH YOUR OWN CODE ----
-    logger.info("Generating plot from data...")
-    for i in tqdm(range(10), total=10):
-        if i == 5:
-            logger.info("Something happened for iteration 5.")
-    logger.success("Plot generation complete.")
-    # -----------------------------------------
-
-
-if __name__ == "__main__":
-    app()
+    plt.title('Initial and Final Distributions of Particles')
+    plt.xlabel('Particle Value')
+    plt.ylabel('Density')
+    plt.legend()
+    plt.show()
