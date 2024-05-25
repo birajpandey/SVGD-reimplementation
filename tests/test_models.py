@@ -5,7 +5,7 @@ import unittest
 import jax.numpy as jnp
 import jax.random as jrandom
 import numpy as np
-from svgd import kernel, density, models, plots
+from svgd import kernel, density, models, plots, original_svgd
 import optax
 
 
@@ -64,7 +64,6 @@ class TestModels(unittest.TestCase):
         key = jrandom.PRNGKey(10)
         particles = jrandom.normal(key=key, shape=(1000, 1))
 
-
         # define 1D density
         density_params = {'mean': jnp.array([10.0]),
             'covariance': jnp.array([[0.1]])}
@@ -98,16 +97,14 @@ class TestModels(unittest.TestCase):
 
 
     def test_1d_gaussian_mixture(self):
-        # define model
-        model_params = {'length_scale': 0.3}
-        model_kernel = kernel.Kernel(kernel.rbf_kernel, model_params)
-        transporter = models.SVGDModel(kernel=model_kernel)
-
-
         # define particles
         key = jrandom.PRNGKey(10)
         particles = jrandom.normal(key=key, shape=(1000, 1)) - 10
 
+        # define model
+        model_params = {'length_scale': 0.3}
+        model_kernel = kernel.Kernel(kernel.rbf_kernel, model_params)
+        transporter = models.SVGDModel(kernel=model_kernel)
 
         # define 1D mixture density
         means = jnp.array([[-2.0], [2.0]])
@@ -118,9 +115,8 @@ class TestModels(unittest.TestCase):
         density_obj = density.Density(density.gaussian_mixture_pdf,
                                       density_params)
 
-
         # transport model
-        num_iterations, step_size = 100, 1e-1
+        num_iterations, step_size = 50, 1e-3
 
         # define the optimizer
         optimizer = optax.adam(learning_rate=step_size)
@@ -139,18 +135,9 @@ class TestModels(unittest.TestCase):
         print(f'Means: Expected={expected_mean} Observed={observed_mean}')
         print(f'Variance: Expected={expected_var} Observed={observed_var}')
 
-        # # plot
+        # plot
         plots.plot_gaussian_mixture_distribution(particles, trajectory[-1],
                                                  density_obj)
-        #
-        # # assert
-        # np.testing.assert_array_almost_equal([expected_mean, expected_var],
-        #                                      [observed_mean, observed_var],
-        #                                      decimal=1,
-        #                                      err_msg='Metrics do not match.')
-
-
-
 
 
 

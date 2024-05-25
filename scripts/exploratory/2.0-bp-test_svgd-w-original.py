@@ -41,7 +41,7 @@ density_obj = density.Density(density.gaussian_mixture_pdf, density_params)
 
 
 # new svgd object
-new_svgd = models.SVGDModel(model_kernel)
+
 new_gradient = new_svgd.calculate_gradient(density_obj, particles)
 
 orig_gradient = orig_svgd.calculate_gradients(particles, density_obj.score,
@@ -49,3 +49,33 @@ orig_gradient = orig_svgd.calculate_gradients(particles, density_obj.score,
 
 np.testing.assert_allclose(new_gradient, orig_gradient, rtol=1e-5,
                            atol=1e-8, err_msg='Gradients dont match')
+
+
+# Test updates with the original
+step_size = 0.01
+start_orig = deepcopy(particles)
+start_new = deepcopy(particles)
+
+orig_svgd = original_svgd.OriginalSVGD()
+new_svgd = models.SVGDModel(model_kernel)
+
+for i in range(10):
+    # orig method
+    orig_gradient = orig_svgd.calculate_gradients(start_orig, density_obj.score,
+                                                  h=length_scale)
+    start_orig += step_size * orig_gradient
+
+    # new method
+    new_gradient = new_svgd.calculate_gradient(density_obj, start_new)
+    start_new += step_size * new_gradient
+
+np.testing.assert_allclose(start_orig, start_new, rtol=1e-5,
+                           atol=1e-8, err_msg='Particle positions dont match')
+
+
+
+# Test old method using Adagrad
+
+step_size = 0.1
+optimizer = optax.adagrad(step_size)
+

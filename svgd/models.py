@@ -40,11 +40,11 @@ class SVGDModel(eqx.Module):
     def update(self, particles, density, optimizer, optimizer_state,
                kernel_params=None):
         gradient = self.calculate_gradient(density, particles, kernel_params)
-        print(f'Gradient: {gradient}')
+        print(f'Gradient: {jnp.linalg.norm(gradient)}')
         updates, optimizer_state = optimizer.update(gradient, optimizer_state,
                                               particles)
         updated_particles = optax.apply_updates(particles, updates)
-        print(f'Updated Position: {updated_particles}')
+        # print(f'Updated Position: {updated_particles}')
         return updated_particles, optimizer_state
 
     def predict(self, particles, density, num_iterations, optimizer,
