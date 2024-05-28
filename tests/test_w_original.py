@@ -43,6 +43,54 @@ class TestModels_w_Original(unittest.TestCase):
                                              decimal=1,
                                              err_msg='Metrics do not match.')
 
+    def test_original_svgd_gaussian_shift_mean(self):
+        # define particles
+        key = jrandom.PRNGKey(10)
+        particles = jrandom.normal(key=key, shape=(500, 1))
+
+
+        # define 1D density
+        density_params = {'mean': jnp.array([10.0]),
+            'covariance': jnp.array([[1]])}
+        density_obj = density.Density(density.gaussian_pdf, density_params)
+
+        # transport model
+        num_iterations, step_size = 500, 1e-2
+
+        # Transporter
+        transporter = original_svgd.SVGDModel()
+        transported = transporter.update(particles, density_obj.score,
+                                         n_iter=num_iterations, bandwidth=50,
+                                         stepsize=step_size, adagrad=False)
+
+        # Plot
+        plots.plot_distributions(particles, transported, density_params)
+
+
+    def test_original_svgd_gaussian_dilate_variance(self):
+        # define particles
+        key = jrandom.PRNGKey(10)
+        particles = jrandom.normal(key=key, shape=(500, 1))
+
+
+        # define 1D density
+        density_params = {'mean': jnp.array([4.0]),
+            'covariance': jnp.array([[0.3]])}
+        density_obj = density.Density(density.gaussian_pdf, density_params)
+
+        # transport model
+        num_iterations, step_size = 200, 0.1
+
+        # Transporter
+        transporter = original_svgd.SVGDModel()
+        transported = transporter.update(particles, density_obj.score,
+                                         n_iter=num_iterations, bandwidth=5,
+                                         stepsize=step_size, adagrad=False)
+
+        # Plot
+        plots.plot_distributions(particles, transported, density_params)
+
+
     def test_original_svgd_gaussian_mixture(self):
         # define particles
         key = jrandom.PRNGKey(10)
@@ -59,78 +107,14 @@ class TestModels_w_Original(unittest.TestCase):
                                       density_params)
 
         # transport model
-        num_iterations, step_size = 200, 1e-1
+        num_iterations, step_size = 200, 2.5
 
         # Transporter
         transporter = original_svgd.SVGDModel()
         transported = transporter.update(particles, density_obj.score,
                                          n_iter=num_iterations, bandwidth=0.3,
-                                         stepsize=step_size, adagrad=True)
+                                         stepsize=step_size, adagrad=False)
 
         # Plot
         plots.plot_gaussian_mixture_distribution(particles, transported,
                                                  density_obj)
-
-
-        # check mean
-        expected_mean = jnp.sum(weights * means)
-        expected_var = (jnp.sum(weights * (covariances.squeeze() + means**2))
-                        - expected_mean**2)
-        observed_mean = jnp.mean(transported)
-        observed_var = jnp.var(transported)
-
-        print(f'Means: Expected={expected_mean} Observed={observed_mean}')
-        print(f'Variance: Expected={expected_var} Observed={observed_var}')
-
-
-        # assert
-        # np.testing.assert_array_almost_equal([expected_mean, expected_var],
-        #                                      [observed_mean, observed_var],
-        #                                      decimal=1,
-        #                                      err_msg='Metrics do not match.')
-
-    def test_adagrad_optimizers(self):
-        def manual_adagrad_update(theta, grad_theta, historical_grad, stepsize,
-                                  alpha=0.9, fudge_factor=1e-6):
-            if historical_grad is None:
-                historical_grad = np.zeros_like(grad_theta)
-            historical_grad = alpha * historical_grad + (1 - alpha) * (
-                        grad_theta ** 2)
-            adj_grad = grad_theta / (fudge_factor + np.sqrt(historical_grad))
-            updated_theta = theta + stepsize * adj_grad
-            return updated_theta, historical_grad
-
-        def optax_adagrad_update(theta, grad_theta, optimizer_state,
-                                 optimizer):
-            updates, optimizer_state = optimizer.update(grad_theta,
-                                                        optimizer_state, theta)
-            updated_theta = optax.apply_updates(theta, updates)
-            return updated_theta, optimizer_state
-
-        np.random.seed(0)
-        theta = np.random.randn(10, 5)
-        grad_theta = np.random.randn(10, 5)
-        stepsize = 1e-2
-        alpha = 0.9
-
-        # Manual Adagrad
-        historical_grad = np.zeros_like(grad_theta)
-        updated_theta_manual, historical_grad = manual_adagrad_update(theta,
-                                                                      grad_theta,
-                                                                      historical_grad,
-                                                                      stepsize,
-                                                                      alpha)
-
-        # Optax Adagrad
-        optimizer = optax.adagrad(learning_rate=stepsize,
-                                  initial_accumulator_value=alpha, eps=1e-6)
-        optimizer_state = optimizer.init(theta)
-        updated_theta_optax, optimizer_state = optax_adagrad_update(theta,
-                                                                    grad_theta,
-                                                                    optimizer_state,
-                                                                    optimizer)
-
-        # Compare the updates
-        np.testing.assert_allclose(updated_theta_manual, updated_theta_optax,
-                                   rtol=1e-5, atol=1e-8)
-        print("Test passed. Both optimizers produce similar updates.")

@@ -20,7 +20,9 @@ class Density(eqx.Module):
         return jax.vmap(self.density)(x)
 
     def score(self, x):
-        log_density = lambda x: jnp.log(self.density(x))
+        log_density = lambda x: jnp.clip(jnp.log(self.density(x)),
+                                         a_min=-1e10,
+                                         a_max=1e10)
         score_fun = jax.grad(log_density, argnums=0)
         return jax.vmap(score_fun)(x)
 
@@ -65,5 +67,7 @@ def gaussian_mixture_pdf(x, params):
 
     # Weighted sum of the component PDFs
     pdf = jnp.dot(weights, component_pdfs)
+
+    #
 
     return pdf

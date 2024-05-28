@@ -13,7 +13,7 @@ class SVGDModel(eqx.Module):
     def __init__(self, kernel):
         self.kernel_obj = kernel
 
-    # @eqx.filter_jit
+    @eqx.filter_jit
     def calculate_gradient(self, density, particles, kernel_params=None):
         num_particles = particles.shape[0]
         gram_matrix = self.kernel_obj(particles, particles, kernel_params)
@@ -36,18 +36,14 @@ class SVGDModel(eqx.Module):
         new_length_scale = 0.5 * median_distance / jnp.log(len(particles))
         return new_length_scale
 
-    # @eqx.filter_jit
-    def update(self, particles, density, optimizer, optimizer_state,
-               kernel_params=None):
+    @eqx.filter_jit
+    def update(self, particles, density, step_size, kernel_params=None):
         gradient = self.calculate_gradient(density, particles, kernel_params)
-        print(f'Gradient: {jnp.linalg.norm(gradient)}')
-        updates, optimizer_state = optimizer.update(gradient, optimizer_state,
-                                              particles)
-        updated_particles = optax.apply_updates(particles, updates)
-        # print(f'Updated Position: {updated_particles}')
-        return updated_particles, optimizer_state
+        # print(f'Gradient: {jnp.linalg.norm(gradient)}')
+        updated_particles = particles + step_size * gradient
+        return updated_particles
 
-    def predict(self, particles, density, num_iterations, optimizer,
+    def predict(self, particles, density, num_iterations, step_size,
                 trajectory=False, adapt_length_scale=False):
         particle_trajectory = np.zeros((num_iterations + 1, particles.shape[0],
                               particles.shape[1]))
@@ -55,18 +51,12 @@ class SVGDModel(eqx.Module):
         particle_trajectory[0] = start
         kernel_params = self.kernel_obj.params # initialize
 
-        # initialize the optimizer
-        optimizer_state = optimizer.init(start)
-
         for i in tqdm(range(1, num_iterations + 1)):
             if 'length_scale' in kernel_params and adapt_length_scale:
                 # Update length scale outside of JIT
                 kernel_params['length_scale'] = self.calculate_length_scale(start)
-            print(f'Kernel params: {kernel_params}')
-            start, optimizer_state = self.update(start, density,
-                                                             optimizer,
-                                                             optimizer_state,
-                                                             kernel_params)
+            # print(f'Kernel params: {kernel_params}')
+            start = self.update(start, density, step_size, kernel_params)
             particle_trajectory[i] = start
 
         if trajectory:

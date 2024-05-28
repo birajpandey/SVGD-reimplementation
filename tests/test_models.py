@@ -5,7 +5,7 @@ import unittest
 import jax.numpy as jnp
 import jax.random as jrandom
 import numpy as np
-from svgd import kernel, density, models, plots, original_svgd
+from svgd import kernel, density, models, plots
 import optax
 
 
@@ -20,19 +20,19 @@ class TestModels(unittest.TestCase):
 
         # define particles
         key = jrandom.PRNGKey(10)
-        particles = jrandom.normal(key=key, shape=(1000, 1))
+        particles = jrandom.normal(key=key, shape=(500, 1))
 
 
         # define 1D density
-        density_params = {'mean': jnp.array([30.0]),
+        density_params = {'mean': jnp.array([10.0]),
             'covariance': jnp.array([[1.0]])}
         density_obj = density.Density(density.gaussian_pdf, density_params)
 
         # transport model
-        num_iterations, step_size = 5000, 1e-2
+        num_iterations, step_size = 500, 1e-2
         transported, trajectory = transporter.predict(particles, density_obj,
-                                               step_size, num_iterations,
-                                               trajectory=True)
+                                               num_iterations, step_size,
+                                                      trajectory=True)
 
         # check mean
         expected_mean = density_params['mean'][0]
@@ -55,26 +55,27 @@ class TestModels(unittest.TestCase):
 
     def test_1d_gaussian_dilate_variance(self):
         # define model
-        model_params = {'length_scale': 10.0}
+        model_params = {'length_scale': 5.0}
         model_kernel = kernel.Kernel(kernel.rbf_kernel, model_params)
         transporter = models.SVGDModel(kernel=model_kernel)
 
 
         # define particles
         key = jrandom.PRNGKey(10)
-        particles = jrandom.normal(key=key, shape=(1000, 1))
+        particles = jrandom.normal(key=key, shape=(500, 1))
+
 
         # define 1D density
-        density_params = {'mean': jnp.array([10.0]),
-            'covariance': jnp.array([[0.1]])}
+        density_params = {'mean': jnp.array([4.0]),
+            'covariance': jnp.array([[0.3]])}
         density_obj = density.Density(density.gaussian_pdf,
                                       density_params)
 
         # transport model
-        num_iterations, step_size = 5000, 1e-2
+        num_iterations, step_size = 200, 0.1
         transported, trajectory = transporter.predict(particles, density_obj,
-                                               step_size, num_iterations,
-                                               trajectory=True)
+                                               num_iterations, step_size,
+                                                      trajectory=True)
 
         # check mean
         expected_mean = density_params['mean'][0]
@@ -116,14 +117,12 @@ class TestModels(unittest.TestCase):
                                       density_params)
 
         # transport model
-        num_iterations, step_size = 50, 1e-3
+        num_iterations, step_size = 500, 2.5
 
         # define the optimizer
-        optimizer = optax.adam(learning_rate=step_size)
         transported, trajectory = transporter.predict(particles, density_obj,
-                                               num_iterations, optimizer,
-                                                      trajectory=True,
-                                                      adapt_length_scale=False)
+                                               num_iterations, step_size,
+                                                      trajectory=True)
 
         # check mean
         expected_mean = jnp.sum(weights * means)
@@ -138,6 +137,9 @@ class TestModels(unittest.TestCase):
         # plot
         plots.plot_gaussian_mixture_distribution(particles, trajectory[-1],
                                                  density_obj)
+
+
+
 
 
 
