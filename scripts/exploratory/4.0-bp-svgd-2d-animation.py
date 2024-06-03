@@ -38,7 +38,7 @@ density_obj = density.Density(density.gaussian_mixture_pdf,
 
 # transport
 num_iterations, step_size = 49, 0.5
-transported, trajectory = transporter.predict(particles, density_obj,
+transported, trajectory = transporter.predict(particles, density_obj.score,
                                               num_iterations, step_size,
                                               trajectory=True)
 

@@ -31,7 +31,7 @@ density_obj = density.Density(density.gaussian_mixture_pdf,
 
 # transport
 num_iterations, step_size = 100, 0.5
-transported, trajectory = transporter.predict(particles, density_obj,
+transported, trajectory = transporter.predict(particles, density_obj.score,
                                               num_iterations, step_size,
                                               trajectory=True)
 
@@ -43,7 +43,7 @@ x_plot = np.linspace(-5, 5, grid_res)
 x_plot = np.stack(np.meshgrid(x_plot, x_plot), axis=-1)
 
 # Compute log-probabilities
-log_prob = density_obj(x_plot)
+log_prob = np.log(density_obj(x_plot))
 
 # Reshape to 3D and 2D arrays for plotting
 x_plot = np.reshape(x_plot, (grid_res, grid_res, 2))

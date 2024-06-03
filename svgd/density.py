@@ -71,3 +71,4 @@ def gaussian_mixture_pdf(x, params):
     #
 
     return pdf
+
