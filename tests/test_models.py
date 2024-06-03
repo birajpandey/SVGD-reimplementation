@@ -13,6 +13,7 @@ from svgd import kernel, density, models, plots
 class TestModels(unittest.TestCase):
 
     def test_1d_gaussian_test_shift_mean(self):
+        print("Test: gaussian shift")
         # define model
         model_params = {'length_scale': 50.0}
         model_kernel = kernel.Kernel(kernel.rbf_kernel, model_params)
@@ -31,6 +32,7 @@ class TestModels(unittest.TestCase):
 
         # transport model
         num_iterations, step_size = 500, 1e-2
+        # TODO: refactor predict to take the score
         transported, trajectory = transporter.predict(particles, density_obj,
                                                num_iterations, step_size,
                                                       trajectory=True)
@@ -56,6 +58,7 @@ class TestModels(unittest.TestCase):
 
     def test_1d_gaussian_dilate_variance(self):
         # define model
+        print("Test: gaussian dilate")
         model_params = {'length_scale': 5.0}
         model_kernel = kernel.Kernel(kernel.rbf_kernel, model_params)
         transporter = models.SVGDModel(kernel=model_kernel)
@@ -99,6 +102,7 @@ class TestModels(unittest.TestCase):
 
 
     def test_1d_gaussian_mixture(self):
+        print("Test: gaussian mixture")
         # define particles
         key = jrandom.PRNGKey(10)
         particles = jrandom.normal(key=key, shape=(1000, 1)) - 10
