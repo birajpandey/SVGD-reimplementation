@@ -1,5 +1,6 @@
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = '1'
+os.environ["CUDA_VISIBLE_DEVICES"] = '0'
+os.environ["XLA_PYTHON_CLIENT_PREALLOCATE"] = 'false'
 
 import unittest
 import jax.numpy as jnp
@@ -125,11 +126,12 @@ class TestModels(unittest.TestCase):
                                                       trajectory=True)
 
         # check mean
-        expected_mean = jnp.sum(weights * means)
-        expected_var = (jnp.sum(weights * (covariances.squeeze() + means**2))
+        expected_mean = jnp.sum(weights * means.flatten())
+        expected_var = (jnp.sum(weights * (covariances.squeeze() +
+                                           means.flatten()**2))
                         - expected_mean**2)
-        observed_mean = jnp.mean(transported[-1])
-        observed_var = jnp.var(transported[-1])
+        observed_mean = jnp.mean(transported)
+        observed_var = jnp.var(transported)
 
         print(f'Means: Expected={expected_mean} Observed={observed_mean}')
         print(f'Variance: Expected={expected_var} Observed={observed_var}')
@@ -137,6 +139,11 @@ class TestModels(unittest.TestCase):
         # plot
         plots.plot_gaussian_mixture_distribution(particles, trajectory[-1],
                                                  density_obj)
+        # assert
+        np.testing.assert_array_almost_equal([expected_mean, expected_var],
+                                             [observed_mean, observed_var],
+                                             decimal=1,
+                                             err_msg='Metrics do not match.')
 
 
 
