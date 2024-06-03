@@ -1,7 +1,9 @@
+import os
+os.environ["XLA_PYTHON_CLIENT_PREALLOCATE"] = 'false'
+
 import jax.numpy as jnp
 import jax.random as jrandom
 from svgd import density, kernel
-
 
 # generate data
 n_samples, n_features = 1000, 1

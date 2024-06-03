@@ -1,5 +1,6 @@
 import os
 os.environ["CUDA_VISIBLE_DEVICES"] = '1'
+os.environ["XLA_PYTHON_CLIENT_PREALLOCATE"] = 'false'
 
 import unittest
 import jax.numpy as jnp
@@ -8,11 +9,9 @@ import numpy as np
 from svgd import kernel, density, models, plots, original_svgd
 import matplotlib.pyplot as plt
 
-
-
 # generate 2D example
 key = jrandom.PRNGKey(10)
-particles = jrandom.normal(key=key, shape=(500, 2))  * 0.5
+particles = jrandom.normal(key=key, shape=(500, 2))  * 0.5 + jnp.array([0, 3])
 
 # define model
 model_params = {'length_scale': 0.3}
@@ -31,7 +30,7 @@ density_obj = density.Density(density.gaussian_mixture_pdf,
 
 
 # transport
-num_iterations, step_size = 100, 2.5
+num_iterations, step_size = 100, 0.5
 transported, trajectory = transporter.predict(particles, density_obj,
                                               num_iterations, step_size,
                                               trajectory=True)
@@ -63,6 +62,6 @@ plt.scatter(particles[:, 0], particles[:, 1], zorder=2, c='w', s=10)
 
 
 # plot final particles
-plt.scatter(transported[:, 0], transported[:, 1], zorder=2, c='r', s=10)
+# plt.scatter(transported[:, 0], transported[:, 1], zorder=2, c='r', s=10)
 
 plt.show()
