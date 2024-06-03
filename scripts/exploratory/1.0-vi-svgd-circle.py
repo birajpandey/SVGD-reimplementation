@@ -76,15 +76,15 @@ scores = distribution.score(grid_points)
 ######################################################
 # generate 2D example
 key = jrandom.PRNGKey(10)
-particles = jrandom.normal(key=key, shape=(500, 2)) + jnp.array([3,0])
+particles = jrandom.normal(key=key, shape=(500, 2)) * 0.4 + jnp.array([3,0])
 
 # define model
-model_params = {"length_scale": 0.01}
+model_params = {"length_scale": 0.025}
 model_kernel = kernel.Kernel(kernel.rbf_kernel, model_params)
 transporter = models.SVGDModel(kernel=model_kernel)
 
 # transport
-num_iterations, step_size = 4000, 7
+num_iterations, step_size = 40000, 2
 transported, trajectory = transporter.predict(
     particles, distribution.score, num_iterations, step_size, trajectory=True
 )
@@ -112,5 +112,5 @@ plt.show()
 # plot trajectory
 fig = plt.figure(figsize=(6, 6))
 ax = fig.add_subplot(111)
-ax = plots.plot_2d_trajectories(ax, trajectory, 50, seed=20)
+ax = plots.plot_2d_trajectories(ax, trajectory, 1000, seed=20, alpha=0.03)
 plt.show()

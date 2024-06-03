@@ -60,12 +60,12 @@ def plot_gaussian_mixture_distribution(initial_particles,
     plt.show()
 
 
-def plot_2d_trajectories(ax, trajectory, num_points, seed=20):
+def plot_2d_trajectories(ax, trajectory, num_points, seed=20, alpha=1):
     np.random.seed(seed)
     idx = np.random.randint(0, trajectory.shape[1], num_points)
     for i in idx:
         t = trajectory[:, i, :]
-        plt.plot(t[:, 0], t[:, 1], '-', c='r', alpha=1)
+        plt.plot(t[:, 0], t[:, 1], '-', c='r', alpha=alpha)
     plt.scatter(trajectory[-1, idx, 0], trajectory[-1, idx, 1],
                 s=20, facecolors='k', edgecolors='k', label='target')
     plt.scatter(trajectory[0, idx, 0], trajectory[0, idx, 1],
