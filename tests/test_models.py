@@ -32,8 +32,7 @@ class TestModels(unittest.TestCase):
 
         # transport model
         num_iterations, step_size = 500, 1e-2
-        # TODO: refactor predict to take the score
-        transported, trajectory = transporter.predict(particles, density_obj,
+        transported, trajectory = transporter.predict(particles, density_obj.score,
                                                num_iterations, step_size,
                                                       trajectory=True)
 
@@ -77,7 +76,7 @@ class TestModels(unittest.TestCase):
 
         # transport model
         num_iterations, step_size = 200, 0.1
-        transported, trajectory = transporter.predict(particles, density_obj,
+        transported, trajectory = transporter.predict(particles, density_obj.score,
                                                num_iterations, step_size,
                                                       trajectory=True)
 
@@ -125,7 +124,7 @@ class TestModels(unittest.TestCase):
         num_iterations, step_size = 500, 2.5
 
         # define the optimizer
-        transported, trajectory = transporter.predict(particles, density_obj,
+        transported, trajectory = transporter.predict(particles, density_obj.score,
                                                num_iterations, step_size,
                                                       trajectory=True)
 

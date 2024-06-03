@@ -14,10 +14,10 @@ class SVGDModel(eqx.Module):
         self.kernel_obj = kernel
 
     @eqx.filter_jit
-    def calculate_gradient(self, density, particles, kernel_params=None):
+    def calculate_gradient(self, score_obj, particles, kernel_params=None):
         num_particles = particles.shape[0]
         gram_matrix = self.kernel_obj(particles, particles, kernel_params)
-        score_matrix = density.score(particles)
+        score_matrix = score_obj(particles)
         kernel_gradient = self.kernel_obj.gradient_wrt_first_arg(particles,
                                                                  particles,
                                                                  kernel_params)
@@ -37,13 +37,13 @@ class SVGDModel(eqx.Module):
         return new_length_scale
 
     @eqx.filter_jit
-    def update(self, particles, density, step_size, kernel_params=None):
-        gradient = self.calculate_gradient(density, particles, kernel_params)
+    def update(self, particles, score_obj, step_size, kernel_params=None):
+        gradient = self.calculate_gradient(score_obj, particles, kernel_params)
         # print(f'Gradient: {jnp.linalg.norm(gradient)}')
         updated_particles = particles + step_size * gradient
         return updated_particles
 
-    def predict(self, particles, density, num_iterations, step_size,
+    def predict(self, particles, score_obj, num_iterations, step_size,
                 trajectory=False, adapt_length_scale=False):
         particle_trajectory = np.zeros((num_iterations + 1, particles.shape[0],
                               particles.shape[1]))
@@ -56,7 +56,7 @@ class SVGDModel(eqx.Module):
                 # Update length scale outside of JIT
                 kernel_params['length_scale'] = self.calculate_length_scale(start)
             # print(f'Kernel params: {kernel_params}')
-            start = self.update(start, density, step_size, kernel_params)
+            start = self.update(start, score_obj, step_size, kernel_params)
             particle_trajectory[i] = start
 
         if trajectory:
