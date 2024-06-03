@@ -6,7 +6,7 @@ import jax.numpy as jnp
 import jax.random as jrandom
 import numpy as np
 from svgd import kernel, density, models, plots, original_svgd
-import optax
+ 
 
 class TestModels_w_Original(unittest.TestCase):
     def test_gradients_with_original_implementation(self):

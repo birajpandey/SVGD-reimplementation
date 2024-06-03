@@ -2,7 +2,7 @@ from scipy.spatial.distance import pdist, squareform
 import numpy as np
 from tqdm import tqdm
 import jax.numpy as jnp
-import optax
+ 
 class SVGDModel():
 
     def __init__(self):

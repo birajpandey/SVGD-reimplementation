@@ -4,7 +4,7 @@ import numpy as np
 import jax
 from tqdm import tqdm
 import equinox as eqx
-import optax
+ 
 
 
 class SVGDModel(eqx.Module):

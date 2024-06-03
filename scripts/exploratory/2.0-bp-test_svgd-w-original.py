@@ -5,7 +5,6 @@ import jax.numpy as jnp
 import jax.random as jrandom
 import numpy as np
 from svgd import kernel, density, models, plots, original_svgd
-import optax
 from copy import deepcopy
 
 # define the particles
@@ -75,7 +74,4 @@ np.testing.assert_allclose(start_orig, start_new, rtol=1e-5,
 
 
 # Test old method using Adagrad
-
-step_size = 0.1
-optimizer = optax.adagrad(step_size)
 
