@@ -27,12 +27,13 @@ class SVGDModel(eqx.Module):
         kernel_gradient_term = jnp.sum(kernel_gradient, axis=0)
         phi = (kernel_score_term + kernel_gradient_term) / num_particles
         return phi
-
+    
+    @eqx.filter_jit
     def calculate_length_scale(self, particles):
-        pairwise_distances = jnp.sqrt(jnp.sum((particles[:, None, :] -
-                                               particles[None, :, :]) ** 2,
-                                              axis=-1))
-        median_distance = jnp.median(pairwise_distances)
+        pairwise_sq_distances= jax.vmap(
+            lambda x1: jax.vmap(lambda y1: jnp.sum((x1 - y1) ** 2))(
+                particles))(particles)
+        median_distance = jnp.sqrt(jnp.median(pairwise_sq_distances))
         new_length_scale = 0.5 * median_distance / jnp.log(len(particles))
         return new_length_scale
 
