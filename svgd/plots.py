@@ -62,7 +62,10 @@ def plot_gaussian_mixture_distribution(initial_particles,
 
 def plot_2d_trajectories(ax, trajectory, num_points, seed=20, alpha=1):
     np.random.seed(seed)
-    idx = np.random.randint(0, trajectory.shape[1], num_points)
+    if trajectory.shape[1] == num_points:
+        idx = np.arange(0, num_points)
+    else:
+        idx = np.random.randint(0, trajectory.shape[1], num_points)
     for i in idx:
         t = trajectory[:, i, :]
         plt.plot(t[:, 0], t[:, 1], '-', c='r', alpha=alpha)

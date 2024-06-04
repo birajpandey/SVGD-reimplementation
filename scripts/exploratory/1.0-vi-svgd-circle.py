@@ -5,6 +5,7 @@ os.environ["XLA_PYTHON_CLIENT_PREALLOCATE"] = "false"
 
 import jax.numpy as jnp
 import jax.random as jrandom
+import jax
 import numpy as np
 from svgd import kernel, density, models, plots, original_svgd
 
@@ -55,31 +56,15 @@ RADIUS = 1
 STD = 0.1
 distribution = RingDistribution(radius=RADIUS, std=STD)
 
-X = distribution.sample(n_samples=10000, seed=1234)
-
-# Create a grid of points for plots.
-size = RADIUS + 5 * STD
-step = 0.1
-x_grid, y_grid = np.meshgrid(
-    np.arange(-size, size + step, step), np.arange(-size, size + step, step)
-)
-grid_points = np.c_[x_grid.ravel(), y_grid.ravel()]
-
-# f, ax = plt.subplots()
-# ax.scatter(X[:, 0], X[:, 1], edgecolors="k")
-
-scores = distribution.score(grid_points)
-# ax.quiver(x_grid, y_grid, scores[:, 0], scores[:, 1])
-# ax.set_title("Samples (dots) and true score function (vectors)")
-# plt.show()
-
 ######################################################
 # generate 2D example
 key = jrandom.PRNGKey(10)
-particles = jrandom.normal(key=key, shape=(500, 2)) * 0.4 + jnp.array([3,0])
+n = 500
+particles = jrandom.normal(key=key, shape=(n, 2)) * 0.4 + jnp.array([3,0])
 
 # define model
-model_params = {"length_scale": 0.025}
+kernel_bandwidth = 0.025
+model_params = {"length_scale": kernel_bandwidth}
 model_kernel = kernel.Kernel(kernel.rbf_kernel, model_params)
 transporter = models.SVGDModel(kernel=model_kernel)
 
@@ -106,15 +91,15 @@ plt.scatter(particles[:, 0], particles[:, 1], zorder=2, c="w", s=10, label="init
 # plot final particles
 plt.scatter(transported[:, 0], transported[:, 1], zorder=2, c='r', s=10, label="final sample", alpha=0.6)
 plt.legend()
-plt.title("Transported Particles")
+plt.title(f"Transported Particles, h={kernel_bandwidth}")
 
 plt.show()
 
 # plot trajectory
 fig = plt.figure(figsize=(6, 6))
 ax = fig.add_subplot(111)
-ax = plots.plot_2d_trajectories(ax, trajectory, 2000, seed=20, alpha=0.03)
+ax = plots.plot_2d_trajectories(ax, trajectory, n, seed=20, alpha=0.03)
 ax.set_xlim(-2, 4)
 ax.set_ylim(-3, 3)
-ax.set_title("Trajectories of 2000 particles")
+ax.set_title(f"Trajectories of {n} particles")
 plt.show()

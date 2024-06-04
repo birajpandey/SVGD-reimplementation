@@ -34,7 +34,7 @@ class SVGDModel(eqx.Module):
             lambda x1: jax.vmap(lambda y1: jnp.sum((x1 - y1) ** 2))(
                 particles))(particles)
         median_distance = jnp.sqrt(jnp.median(pairwise_sq_distances))
-        new_length_scale = 0.5 * median_distance / jnp.log(len(particles))
+        new_length_scale = median_distance**2 / jnp.log(len(particles))
         return new_length_scale
 
     @eqx.filter_jit
