@@ -6,12 +6,12 @@ import unittest
 import jax.numpy as jnp
 import jax.random as jrandom
 import numpy as np
-from svgd import kernel, density, models, plots
+import matplotlib.pyplot as plt
+from svgd import kernel, density, models, plots, config
 
 
 
 class TestModels(unittest.TestCase):
-
     def test_1d_gaussian_test_shift_mean(self):
         print("Test: gaussian shift")
         # define model
@@ -22,7 +22,7 @@ class TestModels(unittest.TestCase):
 
         # define particles
         key = jrandom.PRNGKey(10)
-        particles = jrandom.normal(key=key, shape=(500, 1))
+        particles = jrandom.normal(key=key, shape=(700, 1))
 
 
         # define 1D density
@@ -31,7 +31,7 @@ class TestModels(unittest.TestCase):
         density_obj = density.Density(density.gaussian_pdf, density_params)
 
         # transport model
-        num_iterations, step_size = 500, 1e-2
+        num_iterations, step_size = 1000, 1e-2
         transported, trajectory = transporter.predict(particles, density_obj.score,
                                                num_iterations, step_size,
                                                       trajectory=True)
@@ -47,13 +47,16 @@ class TestModels(unittest.TestCase):
         print(f'Variance: Expected={expected_var} Observed={observed_var}')
 
         # plot
-        plots.plot_distributions(particles, trajectory[-1], density_params)
+        fig = plots.plot_distributions(particles, trajectory[-1], density_params)
+        fig.savefig(str(config.REPORTS_DIR) +
+                    '/figures/1d_gaussian_test_shift_mean.pdf', dpi=600)
 
         # assert
         np.testing.assert_array_almost_equal([expected_mean, expected_var],
                                              [observed_mean, observed_var],
                                              decimal=1,
                                              err_msg='Metrics do not match.')
+
 
     def test_1d_gaussian_dilate_variance(self):
         # define model
@@ -65,7 +68,7 @@ class TestModels(unittest.TestCase):
 
         # define particles
         key = jrandom.PRNGKey(10)
-        particles = jrandom.normal(key=key, shape=(500, 1))
+        particles = jrandom.normal(key=key, shape=(700, 1))
 
 
         # define 1D density
@@ -75,7 +78,7 @@ class TestModels(unittest.TestCase):
                                       density_params)
 
         # transport model
-        num_iterations, step_size = 200, 0.1
+        num_iterations, step_size = 1000, 0.1
         transported, trajectory = transporter.predict(particles, density_obj.score,
                                                num_iterations, step_size,
                                                       trajectory=True)
@@ -92,6 +95,8 @@ class TestModels(unittest.TestCase):
 
         # plot
         plots.plot_distributions(particles, trajectory[-1], density_params)
+        plt.savefig(str(config.REPORTS_DIR) +
+                    '/figures/1d_gaussian_dilate_variance.pdf', dpi=600)
 
         # assert
         np.testing.assert_array_almost_equal([expected_mean, expected_var],
@@ -100,14 +105,15 @@ class TestModels(unittest.TestCase):
                                              err_msg='Metrics do not match.')
 
 
+
     def test_1d_gaussian_mixture(self):
         print("Test: gaussian mixture")
         # define particles
         key = jrandom.PRNGKey(10)
-        particles = jrandom.normal(key=key, shape=(1000, 1)) - 10
+        particles = jrandom.normal(key=key, shape=(5000, 1)) - 10
 
         # define model
-        model_params = {'length_scale': 0.3}
+        model_params = {'length_scale': 0.65}
         model_kernel = kernel.Kernel(kernel.rbf_kernel, model_params)
         transporter = models.SVGDModel(kernel=model_kernel)
 
@@ -121,7 +127,7 @@ class TestModels(unittest.TestCase):
                                       density_params)
 
         # transport model
-        num_iterations, step_size = 500, 2.5
+        num_iterations, step_size = 500, 3
 
         # define the optimizer
         transported, trajectory = transporter.predict(particles, density_obj.score,
@@ -140,15 +146,15 @@ class TestModels(unittest.TestCase):
         print(f'Variance: Expected={expected_var} Observed={observed_var}')
 
         # plot
-        plots.plot_gaussian_mixture_distribution(particles, trajectory[-1],
-                                                 density_obj)
+        fig = plots.plot_gaussian_mixture_distribution(particles, trajectory[
+            -1], density_obj)
+        plt.savefig(str(config.REPORTS_DIR) +
+                    '/figures/1d_gaussian_mixture.pdf', dpi=600)
         # assert
         np.testing.assert_array_almost_equal([expected_mean, expected_var],
                                              [observed_mean, observed_var],
                                              decimal=1,
                                              err_msg='Metrics do not match.')
-
-
 
 
 

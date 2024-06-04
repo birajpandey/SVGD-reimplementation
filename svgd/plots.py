@@ -4,7 +4,7 @@ from scipy.stats import norm
 import jax.numpy as jnp
 
 def plot_distributions(initial_particles, transported_particles, density_params):
-    plt.figure(figsize=(10, 6))
+    fig = plt.figure(figsize=(10, 6))
 
     # Plot histogram of initial particles
     plt.hist(initial_particles, bins=30, density=True, alpha=0.4, color='b',
@@ -21,11 +21,12 @@ def plot_distributions(initial_particles, transported_particles, density_params)
     y = norm.pdf(x, mean, std_dev)
     plt.plot(x, y, 'r-', lw=2, label='Target Distribution')
 
-    plt.title('Initial and Final Distributions of Particles')
+    # plt.title('Initial and Final Distributions of Particles')
     plt.xlabel('Particle Value')
     plt.ylabel('Density')
     plt.legend()
     plt.show()
+    return fig
 
 
 # Plotting function
