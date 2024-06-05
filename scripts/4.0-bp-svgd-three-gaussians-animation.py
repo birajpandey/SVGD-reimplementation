@@ -18,7 +18,7 @@ plt.ioff()
 
 # generate 2D example
 key = jrandom.PRNGKey(10)
-particles = jrandom.normal(key=key, shape=(500, 2))  * 0.5 + jnp.array([0, 3])
+particles = jrandom.normal(key=key, shape=(500, 2))  * 0.5
 
 # define model
 model_params = {'length_scale': 0.3}
@@ -54,8 +54,9 @@ sel_trajectory = trajectory[:, idx, :]
 
 fig = plt.figure(figsize=(3, 3))
 ax = fig.add_subplot(111)
-ax.set_xlim(-5, 5)
-ax.set_ylim(-5, 5)
+ax.set_xlim(-4.5, 4.5)
+ax.set_ylim(-4.5, 4.5)
+ax.set_title('Trajectory')
 ax.set_xticks([])
 ax.set_yticks([])
 
@@ -95,7 +96,7 @@ plt.tight_layout()
 ani = FuncAnimation(fig, update, frames=range(sel_trajectory.shape[0]), init_func=init, blit=True)
 
 reports_path = 'reports/figures/'
-figure_name = '3_gaussians_bad_init_trajectory_video.gif'
+figure_name = '3_gaussians_trajectory_video.gif'
 writergif = PillowWriter(fps=10)
 ani.save(reports_path + figure_name, dpi=600, writer=writergif)
 print(f'Saved figure {figure_name}')

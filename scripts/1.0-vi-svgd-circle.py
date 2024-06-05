@@ -20,41 +20,9 @@ plt.rcParams["image.cmap"] = "RdBu"
 bright_colormap = ListedColormap(["#FF0000", "#0000FF"])
 
 
-class RingDistribution:
-    """Two-dimensional probability distribution centered around a ring, with
-    radial normal noise and uniform angular distribution.
-    """
-
-    def __init__(self, radius, std):
-        self.mean = radius
-        self.std = std
-
-    def sample(self, n_samples, seed=None):
-        """Return an array of samples from the distribution."""
-        np.random.seed(seed)
-        r = np.random.normal(loc=self.mean, scale=self.std, size=n_samples)
-        theta = np.random.uniform(low=-np.pi, high=np.pi, size=n_samples)
-
-        x1 = r * np.cos(theta)
-        x2 = r * np.sin(theta)
-        x = np.array([x1, x2]).T
-        return x
-
-    def pdf(self, x):
-        """Probability density function."""
-        r = np.sqrt((x**2).sum(axis=1))
-        return norm.pdf(r, loc=self.mean, scale=self.std)
-
-    def score(self, x):
-        """Gradient of the log of the PDF."""
-        r = jnp.sqrt((x**2).sum(axis=1))
-        scores = x * (RADIUS / r - 1).reshape(-1, 1)
-        return scores
-
-
 RADIUS = 1
 STD = 0.1
-distribution = RingDistribution(radius=RADIUS, std=STD)
+distribution = density.RingDistribution(radius=RADIUS, std=STD)
 
 ######################################################
 # generate 2D example
