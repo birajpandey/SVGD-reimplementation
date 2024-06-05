@@ -44,11 +44,6 @@ class TestModels(unittest.TestCase):
         print(f'Means: Expected={expected_mean} Observed={observed_mean}')
         print(f'Variance: Expected={expected_var} Observed={observed_var}')
 
-        # plot
-        fig = plots.plot_distributions(particles, trajectory[-1], density_params)
-        fig.savefig(str(config.REPORTS_DIR) +
-                    '/figures/1d_gaussian_test_shift_mean.pdf', dpi=600)
-
         # assert
         np.testing.assert_array_almost_equal([expected_mean, expected_var],
                                              [observed_mean, observed_var],
@@ -90,12 +85,6 @@ class TestModels(unittest.TestCase):
         print(transported.shape, trajectory.shape)
         print(f'Means: Expected={expected_mean} Observed={observed_mean}')
         print(f'Variance: Expected={expected_var} Observed={observed_var}')
-
-        # plot
-        fig = plots.plot_distributions(particles, trajectory[-1],
-                                      density_params)
-        fig.savefig(str(config.REPORTS_DIR) +
-                    '/figures/1d_gaussian_dilate_variance.pdf', dpi=600)
 
         # assert
         np.testing.assert_array_almost_equal([expected_mean, expected_var],
@@ -144,11 +133,7 @@ class TestModels(unittest.TestCase):
         print(f'Means: Expected={expected_mean} Observed={observed_mean}')
         print(f'Variance: Expected={expected_var} Observed={observed_var}')
 
-        # plot
-        fig = plots.plot_gaussian_mixture_distribution(particles, trajectory[
-            -1], density_obj)
-        fig.savefig(str(config.REPORTS_DIR) +
-                    '/figures/1d_gaussian_mixture.pdf', dpi=600)
+
         # assert
         np.testing.assert_array_almost_equal([expected_mean, expected_var],
                                              [observed_mean, observed_var],
