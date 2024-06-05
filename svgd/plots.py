@@ -22,9 +22,11 @@ def plot_distributions(initial_particles, transported_particles, density_params)
     plt.plot(x, y, 'r-', lw=2, label='Target Distribution')
 
     # plt.title('Initial and Final Distributions of Particles')
-    plt.xlabel('Particle Value')
-    plt.ylabel('Density')
-    plt.legend()
+    plt.xlabel('Particle Value', fontsize=20)
+    plt.ylabel('Density', fontsize=20)
+    plt.legend(fontsize=16)
+    plt.xticks(fontsize=12)
+    plt.yticks(fontsize=12)
     plt.show()
     return fig
 
@@ -32,7 +34,7 @@ def plot_distributions(initial_particles, transported_particles, density_params)
 # Plotting function
 def plot_gaussian_mixture_distribution(initial_particles,
                                        transported_particles, density):
-    plt.figure(figsize=(10, 6))
+    fig = plt.figure(figsize=(10, 6))
 
     plt.hist(initial_particles, bins=30, density=True, alpha=0.4, color='b', label='Initial Particles')
     plt.hist(transported_particles, bins=30, density=True, alpha=0.4, color='g', label='Transported Particles')
@@ -54,11 +56,14 @@ def plot_gaussian_mixture_distribution(initial_particles,
     y = density(x)
     plt.plot(x, y, 'r-', lw=2, label='Target Distribution')
 
-    plt.title('Initial and Final Distributions of Particles')
-    plt.xlabel('Particle Value')
-    plt.ylabel('Density')
-    plt.legend()
+    # plt.title('Initial and Final Distributions of Particles')
+    plt.xlabel('Particle Value', fontsize=20)
+    plt.ylabel('Density', fontsize=20)
+    plt.legend(fontsize=16)
+    plt.xticks(fontsize=12)
+    plt.yticks(fontsize=12)
     plt.show()
+    return fig
 
 
 def plot_2d_trajectories(ax, trajectory, num_points, seed=20, alpha=1):

@@ -6,9 +6,7 @@ import unittest
 import jax.numpy as jnp
 import jax.random as jrandom
 import numpy as np
-import matplotlib.pyplot as plt
 from svgd import kernel, density, models, plots, config
-
 
 
 class TestModels(unittest.TestCase):
@@ -94,8 +92,9 @@ class TestModels(unittest.TestCase):
         print(f'Variance: Expected={expected_var} Observed={observed_var}')
 
         # plot
-        plots.plot_distributions(particles, trajectory[-1], density_params)
-        plt.savefig(str(config.REPORTS_DIR) +
+        fig = plots.plot_distributions(particles, trajectory[-1],
+                                      density_params)
+        fig.savefig(str(config.REPORTS_DIR) +
                     '/figures/1d_gaussian_dilate_variance.pdf', dpi=600)
 
         # assert
@@ -148,7 +147,7 @@ class TestModels(unittest.TestCase):
         # plot
         fig = plots.plot_gaussian_mixture_distribution(particles, trajectory[
             -1], density_obj)
-        plt.savefig(str(config.REPORTS_DIR) +
+        fig.savefig(str(config.REPORTS_DIR) +
                     '/figures/1d_gaussian_mixture.pdf', dpi=600)
         # assert
         np.testing.assert_array_almost_equal([expected_mean, expected_var],

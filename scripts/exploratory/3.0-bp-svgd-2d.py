@@ -1,5 +1,5 @@
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = '1'
+os.environ["CUDA_VISIBLE_DEVICES"] = '0'
 os.environ["XLA_PYTHON_CLIENT_PREALLOCATE"] = 'false'
 
 import unittest
@@ -14,7 +14,7 @@ key = jrandom.PRNGKey(10)
 particles = jrandom.normal(key=key, shape=(500, 2))  * 0.5 + jnp.array([0, 3])
 
 # define model
-model_params = {'length_scale': 0.3}
+model_params = {'length_scale': 1.95}
 model_kernel = kernel.Kernel(kernel.rbf_kernel, model_params)
 transporter = models.SVGDModel(kernel=model_kernel)
 
@@ -30,10 +30,11 @@ density_obj = density.Density(density.gaussian_mixture_pdf,
 
 
 # transport
-num_iterations, step_size = 100, 0.5
+num_iterations, step_size = 1000, 0.5
 transported, trajectory = transporter.predict(particles, density_obj.score,
                                               num_iterations, step_size,
-                                              trajectory=True)
+                                              trajectory=True,
+                                              adapt_length_scale=False)
 
 
 # plot density
@@ -54,14 +55,20 @@ levels = np.max(np.exp(log_prob)) * np.exp(- np.linspace(4, 0, 5) ** 2)
 
 # Plot density
 plt.figure(figsize=(5, 5))
-plt.contourf( x_plot[:, :, 0], x_plot[:, :, 1], np.exp(log_prob),
-              cmap="magma")
+plt.contourf( x_plot[:, :, 0], x_plot[:, :, 1], np.exp(log_prob), cmap="magma")
+plt.scatter(particles[:, 0], particles[:, 1], zorder=2, c='w', s=10,
+            alpha=0.5, label='Initial')
+plt.scatter(transported[:, 0], transported[:, 1], zorder=2, c='r', s=10,
+            alpha=1, label='Final')
+plt.xlim(-5, 5)
+plt.ylim(-5, 5)
+plt.show()
 
-# plot initial particles
-plt.scatter(particles[:, 0], particles[:, 1], zorder=2, c='w', s=10)
 
-
-# plot final particles
-# plt.scatter(transported[:, 0], transported[:, 1], zorder=2, c='r', s=10)
-
+# # plot trajectory
+fig = plt.figure(figsize=(6, 6))
+ax = fig.add_subplot(111)
+ax = plots.plot_2d_trajectories(ax, trajectory[::200, :, :], 5, seed=20)
+plt.xlim(-5, 5)
+plt.ylim(-5, 5)
 plt.show()

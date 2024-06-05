@@ -68,7 +68,6 @@ def gaussian_mixture_pdf(x, params):
     # Weighted sum of the component PDFs
     pdf = jnp.dot(weights, component_pdfs)
 
-    #
 
     return pdf
 
