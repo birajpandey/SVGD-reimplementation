@@ -2,14 +2,11 @@ import os
 os.environ["CUDA_VISIBLE_DEVICES"] = '0'
 os.environ["XLA_PYTHON_CLIENT_PREALLOCATE"] = 'false'
 
-import unittest
 import jax.numpy as jnp
 import jax.random as jrandom
 import numpy as np
 from svgd import kernel, density, models, plots, config
 import matplotlib.pyplot as plt
-
-
 
 
 class three_gaussian_transport():
@@ -46,44 +43,48 @@ class three_gaussian_transport():
                                                       trajectory=True,
                                                       adapt_length_scale=False)
 
-
-        # plot density
+        # Plot density
         grid_res = 100
-        # Input locations at which to compute log-probabilities
-        x_plot = np.linspace(-5, 5, grid_res)
+        # Input locations at which to compute probabilities
+        x_plot = np.linspace(-4.5, 4.5, grid_res)
         x_plot = np.stack(np.meshgrid(x_plot, x_plot), axis=-1)
 
-        # Compute log-probabilities
-        log_prob = np.log(self.density_obj(x_plot))
-
-        # Reshape to 3D and 2D arrays for plotting
-        x_plot = np.reshape(x_plot, (grid_res, grid_res, 2))
-        log_prob = np.reshape(log_prob, (grid_res, grid_res))
-
-        # Contourplot levels corresponding to standard deviations
-        levels = np.max(np.exp(log_prob)) * np.exp(- np.linspace(4, 0, 5) ** 2)
-
         # Plot density
+        prob = self.density_obj(x_plot.reshape(-1, 2)).reshape(grid_res,
+                                                               grid_res)
         plt.figure(figsize=(5, 5))
-        plt.contourf( x_plot[:, :, 0], x_plot[:, :, 1], np.exp(log_prob), cmap="magma")
-        plt.scatter(particles[:, 0], particles[:, 1], zorder=2, c='w', s=10,
-                    alpha=0.5, label='Initial')
-        plt.scatter(transported[:, 0], transported[:, 1], zorder=2, c='r', s=10,
-                    alpha=1, label='Final')
-        plt.xlim(-5, 5)
-        plt.ylim(-5, 5)
+        plt.contourf(x_plot[:, :, 0], x_plot[:, :, 1],
+                     prob, cmap="magma")
+
+        # plot initial particles
+        plt.scatter(particles[:, 0], particles[:, 1], zorder=2, c="w", s=10,
+                    label="initial sample", alpha=0.5)
+
+        # plot final particles
+        plt.scatter(transported[:, 0], transported[:, 1], zorder=2, c='r',
+                    s=10, label="final sample", alpha=0.6)
+        plt.xlim(-4.5, 4.5)
+        plt.ylim(-4.5, 4.5)
+        plt.legend()
+        plt.title(f"Transported Particles, h={model_params['length_scale']}")
+        plt.savefig(self.reports_dir + '/figures/3_gaussians.pdf',
+                    dpi=600)
         plt.show()
 
 
         #  plot trajectory
+        n = 500
         fig = plt.figure(figsize=(6, 6))
         ax = fig.add_subplot(111)
-        ax = plots.plot_2d_trajectories(ax, trajectory[::200, :, :], 30,
-                                        seed=20)
-        plt.xlim(-5, 5)
-        plt.ylim(-5, 5)
+        ax = plots.plot_2d_trajectories(ax, trajectory, n, seed=20,
+                                        alpha=0.1)
+        ax.set_xlim(-5, 5)
+        ax.set_ylim(-5, 5)
+        plt.legend()
+        ax.set_title(f"Trajectory of {n} particles")
+        plt.savefig(self.reports_dir + '/figures/3_gaussians_trajectory.pdf',
+                    dpi=600)
         plt.show()
-
 
     def bad_initialization(self):
         print('Running bad initialization experiment...')
@@ -107,31 +108,49 @@ class three_gaussian_transport():
                                                       adapt_length_scale=False)
 
 
-        # plot density
+        # Plot density
         grid_res = 100
-        # Input locations at which to compute log-probabilities
-        x_plot = np.linspace(-5, 5, grid_res)
+        # Input locations at which to compute probabilities
+        x_plot = np.linspace(-4.5, 4.5, grid_res)
         x_plot = np.stack(np.meshgrid(x_plot, x_plot), axis=-1)
 
-        # Compute log-probabilities
-        log_prob = np.log(self.density_obj(x_plot))
-
-        # Reshape to 3D and 2D arrays for plotting
-        x_plot = np.reshape(x_plot, (grid_res, grid_res, 2))
-        log_prob = np.reshape(log_prob, (grid_res, grid_res))
-
-        # Contourplot levels corresponding to standard deviations
-        levels = np.max(np.exp(log_prob)) * np.exp(- np.linspace(4, 0, 5) ** 2)
-
         # Plot density
-        plt.figure(figsize=(5, 5))
-        plt.contourf( x_plot[:, :, 0], x_plot[:, :, 1], np.exp(log_prob), cmap="magma")
-        plt.scatter(particles[:, 0], particles[:, 1], zorder=2, c='w', s=10,
-                    alpha=0.5, label='Initial')
-        plt.scatter(transported[:, 0], transported[:, 1], zorder=2, c='r', s=10,
-                    alpha=1, label='Final')
-        plt.xlim(-5, 5)
-        plt.ylim(-5, 5)
+        prob = self.density_obj(x_plot.reshape(-1, 2)).reshape(grid_res,
+                                                               grid_res)
+        fig = plt.figure(figsize=(5, 5))
+        plt.contourf(x_plot[:, :, 0], x_plot[:, :, 1],
+                     prob, cmap="magma")
+
+        # plot initial particles
+        plt.scatter(particles[:, 0], particles[:, 1], zorder=2, c="w", s=10,
+                    label="initial sample", alpha=0.5)
+
+        # plot final particles
+        plt.scatter(transported[:, 0], transported[:, 1], zorder=2, c='r',
+                    s=10, label="final sample", alpha=0.6)
+        plt.xlim(-4.5, 4.5)
+        plt.ylim(-4.5, 4.5)
+        plt.legend()
+        plt.title(f"Transported Particles, h={model_params['length_scale']}")
+        plt.savefig(self.reports_dir +
+                    '/figures/3_gaussians_bad_init.pdf',
+                    dpi=600)
+        plt.show()
+
+
+        #  plot trajectory
+        n = 500
+        fig = plt.figure(figsize=(6, 6))
+        ax = fig.add_subplot(111)
+        ax = plots.plot_2d_trajectories(ax, trajectory, n, seed=20,
+                                        alpha=0.1)
+        ax.set_xlim(-4.5, 4.5)
+        ax.set_ylim(-4.5, 4.5)
+        plt.legend()
+        ax.set_title(f"Trajectory of {n} particles")
+        plt.savefig(self.reports_dir +
+                    '/figures/3_gaussians_bad_init_trajectory.pdf',
+                    dpi=600)
         plt.show()
 
     def strange_circle_transport(self):
@@ -155,31 +174,48 @@ class three_gaussian_transport():
                                                       adapt_length_scale=False)
 
 
-        # plot density
+        # Plot density
         grid_res = 100
-        # Input locations at which to compute log-probabilities
-        x_plot = np.linspace(-5, 5, grid_res)
+        # Input locations at which to compute probabilities
+        x_plot = np.linspace(-4.5, 4.5, grid_res)
         x_plot = np.stack(np.meshgrid(x_plot, x_plot), axis=-1)
 
-        # Compute log-probabilities
-        log_prob = np.log(self.density_obj(x_plot))
-
-        # Reshape to 3D and 2D arrays for plotting
-        x_plot = np.reshape(x_plot, (grid_res, grid_res, 2))
-        log_prob = np.reshape(log_prob, (grid_res, grid_res))
-
-        # Contourplot levels corresponding to standard deviations
-        levels = np.max(np.exp(log_prob)) * np.exp(- np.linspace(4, 0, 5) ** 2)
-
         # Plot density
-        plt.figure(figsize=(5, 5))
-        plt.contourf( x_plot[:, :, 0], x_plot[:, :, 1], np.exp(log_prob), cmap="magma")
-        plt.scatter(particles[:, 0], particles[:, 1], zorder=2, c='w', s=10,
-                    alpha=0.5, label='Initial')
-        plt.scatter(transported[:, 0], transported[:, 1], zorder=2, c='r', s=10,
-                    alpha=1, label='Final')
-        plt.xlim(-5, 5)
-        plt.ylim(-5, 5)
+        prob = self.density_obj(x_plot.reshape(-1, 2)).reshape(grid_res,
+                                                               grid_res)
+        fig = plt.figure(figsize=(5, 5))
+        plt.contourf(x_plot[:, :, 0], x_plot[:, :, 1],
+                     prob, cmap="magma")
+
+        # plot initial particles
+        plt.scatter(particles[:, 0], particles[:, 1], zorder=2, c="w", s=10,
+                    label="initial sample", alpha=0.5)
+
+        # plot final particles
+        plt.scatter(transported[:, 0], transported[:, 1], zorder=2, c='r',
+                    s=10, label="final sample", alpha=0.6)
+        plt.xlim(-4.5, 4.5)
+        plt.ylim(-4.5, 4.5)
+        plt.title(f"Transported Particles, h={model_params['length_scale']}")
+        plt.legend()
+        plt.savefig(self.reports_dir +
+                    '/figures/3_gaussians_strange_circle.pdf',
+                    dpi=600)
+        plt.show()
+
+        #  plot trajectory
+        n = 500
+        fig = plt.figure(figsize=(6, 6))
+        ax = fig.add_subplot(111)
+        ax = plots.plot_2d_trajectories(ax, trajectory, n, seed=20,
+                                        alpha=0.03)
+        ax.set_xlim(-4.5, 4.5)
+        ax.set_ylim(-4.5, 4.5)
+        plt.legend()
+        ax.set_title(f"Trajectory of {n} particles")
+        plt.savefig(self.reports_dir +
+                    '/figures/3_gaussians_strange_circle_trajectory.pdf',
+                    dpi=600)
         plt.show()
 
 

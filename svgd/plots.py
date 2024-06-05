@@ -76,7 +76,7 @@ def plot_2d_trajectories(ax, trajectory, num_points, seed=20, alpha=1):
         t = trajectory[:, i, :]
         plt.plot(t[:, 0], t[:, 1], '-', c='r', alpha=alpha)
     plt.scatter(trajectory[-1, idx, 0], trajectory[-1, idx, 1],
-                s=20, facecolors='k', edgecolors='k', label='target')
+                s=20, facecolors='k', edgecolors='k', label='Final')
     plt.scatter(trajectory[0, idx, 0], trajectory[0, idx, 1],
-                s=20, facecolors='none', edgecolors='k', label='reference')
+                s=20, facecolors='none', edgecolors='k', label='Initial')
     return ax
