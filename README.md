@@ -16,8 +16,7 @@ original implementation is linked [here](https://github.com/dilinwang820/Stein-V
 
 
 ## Final Report
-To read our experimental results, please check out the `AMATH_590_SVGD_report.
-pdf` 
+To read our experimental results, please check out the `AMATH_590_SVGD_report.pdf` 
 in the repo.
 
 ## Setup:
