@@ -119,29 +119,10 @@ plt.show()
 ``` 
 
 
-[//]: # (![png]&#40;3_gaussians.png&#41;)
-
-[//]: # ()
-[//]: # (<p align="center">)
-
-[//]: # ()
-[//]: # (<img align="middle" src="./3_gaussians_trajectory_video.gif" )
-
-[//]: # ()
-[//]: # (width="250" )
-
-[//]: # ()
-[//]: # (height="250" />)
-
-[//]: # ()
-[//]: # (</p>)
-
-
-
-<figure class="half" style="display:flex">
-    <img style="width:500px" src="3_gaussians.png">
-    <img style="width:500px" src="3_gaussians_trajectory_video.gif">
-</figure>
+<p float="left">
+  <img src="3_gaussians.png" width="400" />
+  <img src="3_gaussians_trajectory_video.gif" width="400" /> 
+</p>
 
 ## Reproducing experiments
 
