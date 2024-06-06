@@ -6,7 +6,7 @@ import unittest
 import jax.numpy as jnp
 import jax.random as jrandom
 import numpy as np
-from svgd import kernel, density, models, plots, config
+from svgd import kernel, density, models
 
 
 class TestModels(unittest.TestCase):
