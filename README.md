@@ -64,7 +64,7 @@ os.environ["XLA_PYTHON_CLIENT_PREALLOCATE"] = 'false'
 import jax.numpy as jnp
 import jax.random as jrandom
 import numpy as np
-from svgd import kernel, density, models, plots, config
+from svgd import kernel, density, models
 import matplotlib.pyplot as plt
 
 
