@@ -124,20 +124,21 @@ plt.show()
   <img src="3_gaussians_trajectory_video.gif" width="400" /> 
 </p>
 
-## Reproducing experiments
+## Reproducing our experiments
 
 #### 1D benchmarks
 To reproduce our experiments for 1D benchmarks, run:
 ```
 python scripts/1.0-bp-svgd-1d.py
 ```
+#### 2D benchmarks
 
-To reproduce our experiments for 2D gaussian mixture, run:
+To reproduce our experiments for two-dimensional gaussian mixture, run:
 ```
 python scripts/2.0-bp-three-gaussian.py
 ```
 
-To reproduce our experiments for 2D circle, run:
+To reproduce our experiments for two-dimensional circle, run:
 ```
 python scripts/3.0-vi-svgd-circle.py
 ```
